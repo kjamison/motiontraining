@@ -1,0 +1,20 @@
+Install SimpleCV 1.3 Superpack: http://sourceforge.net/projects/simplecv/files/latest/download?source=files
+	- This installs a number of programs and packages
+ 
+Install VLC Media Player
+  - On Windows, VLC 2.1.* can't use the interface we need to play/pause movies.  Make sure to use VLC 2.0.8 or earlier (until they fix this bug).
+  
+For Windows, install https://pypi.python.org/pypi/psutil 
+
+When you run the motion training script:
+If you get an error about needing the "python imaging library", try installing Pillow 2.6.1: https://pypi.python.org/pypi/Pillow/2.6.1
+	- For Windows, find something like Pillow-2.6.1.win32-py2.7.exe in the list, download it, and install it
+
+
+If you see a bunch of unnecessary garbage printing to the screen while tracking, you might need to edit part of SimpleCV that is being stupid and printing debug output unnecessarily:
+	- On Windows: Go to C:\Python27\Lib\site-packages\SimpleCV\Features
+	- On Mac: Go to /Library/Python/2.7/site-packages/SimpleCV*/SimpleCV/Features
+	- open Blob.py in Notepad or other text editor. 
+	- Find the definition for the "circleDistance" function (the line says "def circleDistance(self):").  Inside that function, if you see 6 or so lines of text starting with "print", replace "print" with "#print" to ignore those lines.
+	- Save Blob.py and try running the motion training script again
+
