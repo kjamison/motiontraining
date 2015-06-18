@@ -21,7 +21,7 @@ graph_y_offset = 10
 graph_datasize=200
 graph_ymax=50
 		
-ymax_stepsize = 1
+ymax_stepsize = 2
 ymax_range = (1,200)
 
 track_options = get_default_options()
@@ -42,8 +42,13 @@ ptcolor_accum = Color.RED
 dot_size = 10
 motion_threshold = 10
 accum_lambda = 0.1
+draw_accum = False
 
-do_vlc_movie = True
+#True = do not show camera image on screen (only show tracking results)
+hide_face = False
+bgcolor = (60,60,60)
+
+do_vlc_movie = False
 
 camprops={"width":640,"height":480}
 
@@ -120,7 +125,8 @@ matchcolor = (142.0, 166.0, 112.0)
 #matchcolor = Color.GREEN
 
 target_colors = ((255,0,0),(255,128,0),(255,255,0),(0,255,0))
-target_sizes = (100,75,50,25)
+dartboard_size = 100
+dartboard_scales = (1,.75,.5,.25)
 
 graph_ymax_new = graph_ymax
 
@@ -187,12 +193,16 @@ while display.isNotDone():
 		graph_ymax_new=graph_ymax + ymax_stepsize
 	elif key[pygame.K_DOWN]:
 		graph_ymax_new=graph_ymax - ymax_stepsize
+	elif key[pygame.K_h]:
+		hide_face = not hide_face
 		
 
 	if not graph_ymax == graph_ymax_new:
 		graph_ymax=min(max(graph_ymax_new,ymax_range[0]),ymax_range[1])
 		graph_ymax_new=graph_ymax
 		print "Graph height scale: ",graph_ymax
+	
+	dartboard_size = 1*graph_ymax
 	
 	if pt0:
 		pt0_draw = pt0
@@ -202,14 +212,24 @@ while display.isNotDone():
 	if not pt0:
 		pt0 = pt
 
+	if hide_face:
+		img.dl().rectangle((0,0),(img.width,img.height),color=bgcolor,width=1,filled=True,alpha=255)
+  
 	if pt0_draw:
 		dl_target = DrawingLayer((img.width,img.height))
-		#for c in range(0,len(target_sizes)):
-		#	dl_target.circle(map(int,pt0_draw),target_sizes[c],color=target_colors[c],alpha=128,filled=True,antialias=True)
-		#dl_target.circle(map(int,pt0_draw),dot_size,color=target_colors[c],alpha=0,filled=True,antialias=True)
-		c=-1
-		dl_target.circle(map(int,pt0_draw),dot_size,color=target_colors[c],alpha=128,filled=True,antialias=True)
-		dl_target.circle(map(int,pt0_draw),graph_ymax,color=pt0color,alpha=255,filled=False,width=min(2,graph_ymax))
+		if hide_face:
+			for c in range(0,len(dartboard_scales)):
+				dl_target.circle(map(int,pt0_draw),dartboard_size*dartboard_scales[c],color=target_colors[c],alpha=128,filled=True,antialias=True)
+			dl_target.circle(map(int,pt0_draw),dot_size,color=target_colors[c],alpha=0,filled=True,antialias=True)
+			c=-1
+			dl_target.circle(map(int,pt0_draw),dot_size,color=target_colors[c],alpha=128,filled=True,antialias=True)
+			#dl_target.circle(map(int,pt0_draw),graph_ymax,color=pt0color,alpha=255,filled=False,width=min(2,graph_ymax))
+
+		else:
+			c=-1
+			dl_target.circle(map(int,pt0_draw),dot_size,color=target_colors[c],alpha=128,filled=True,antialias=True)
+			dl_target.circle(map(int,pt0_draw),graph_ymax,color=pt0color,alpha=255,filled=False,width=min(2,graph_ymax))
+
 		img.addDrawingLayer(dl_target)
 		
 	pt_dist=empty_val
@@ -238,8 +258,8 @@ while display.isNotDone():
 		pt_accum = (ax,ay)
 		
 		pt_accum_yval = pt_dist_accum
-		
-		img.dl().circle(map(int,pt_accum),5,color=ptcolor_accum,alpha=255,filled=True)
+		if draw_accum:
+			img.dl().circle(map(int,pt_accum),5,color=ptcolor_accum,alpha=255,filled=True)
 		
 		pt_accum_entry=(pt_accum[0],pt_accum[1],pt_dist_accum)
 	else:
@@ -258,7 +278,8 @@ while display.isNotDone():
 	
 
 	tracegraph.draw(img.dl(),ymax=graph_ymax,color=ptcolor, linewidth=2)
-	accumgraph.draw(img.dl(),ymax=graph_ymax,color=ptcolor_accum, linewidth=2)
+	if draw_accum:
+		accumgraph.draw(img.dl(),ymax=graph_ymax,color=ptcolor_accum, linewidth=2)
 		
 	trace_idx = (trace_idx + 1) % movement_trace.shape[0]
 
