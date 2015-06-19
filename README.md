@@ -12,3 +12,8 @@ Webcam-based motion tracking for training MRI subjects to lie still in the mock 
 4. Once the interface is up, click on the sticker in the image to reset the tracked sticker color.
 
 This package is built on the <a href="http://simplecv.org/">SimpleCV</a> framework.  See INSTALL.txt for instructions on installing SimpleCV and required packages.
+
+![Camera positioned on coil](https://raw.githubusercontent.com/kjamison/motiontraining/master/coil_and_camera.png)
+![On target](https://raw.githubusercontent.com/kjamison/motiontraining/master/camview_ontarget.png)
+![Off target](https://raw.githubusercontent.com/kjamison/motiontraining/master/camview_offtarget.png)
+
